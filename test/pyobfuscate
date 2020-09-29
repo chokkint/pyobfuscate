@@ -1,0 +1,1190 @@
+#!/usr/bin/env python
+# -*-mode: python; coding: utf-8 -*-
+#
+# pyobfuscate - Python source code obfuscator
+# 
+# Copyright 2004-2007 Peter Astrand <astrand@cendio.se> for Cendio AB
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License. 
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+if 64 - 64: i11iIiiIii
+import sys
+import types
+import symbol
+import token
+import keyword
+import tokenize
+import compiler
+import parser
+import random
+import symtable
+import StringIO
+import getopt
+import re
+if 65 - 65: O0 / iIii1I11I1II1 % OoooooooOO - i1IIi
+o0OO00 = 1
+if 78 - 78: i11i . oOooOoO0Oo0O
+class iI1 :
+ def __init__ ( self ) :
+  self . realnames = { }
+  self . bogusnames = [ ]
+  if 43 - 43: I11i11Ii
+  if 65 - 65: i1iIi11iIIi1I
+ def get_name ( self , name ) :
+  if not self . realnames . has_key ( name ) :
+   if 78 - 78: i11ii11iIi11i . oOoO0oo0OOOo + IiiI / Iii1ii1II11i
+   self . realnames [ name ] = self . gen_unique_name ( )
+  return self . realnames [ name ]
+  if 10 - 10: I1iII1iiII + I1Ii111 / OOo
+  if 41 - 41: I1II1
+ def get_bogus_name ( self , ) :
+  if len ( self . bogusnames ) < 20 :
+   if 100 - 100: iII1iII1i1iiI % iiIIIII1i1iI % iiI11iii111 % I11i11Ii
+   II1Ii1iI1i = self . gen_unique_name ( )
+   self . bogusnames . append ( II1Ii1iI1i )
+   return II1Ii1iI1i
+  else :
+   return random . choice ( self . bogusnames )
+   if 12 - 12: IiiI
+   if 28 - 28: i1IIi % i11i - iiIIIII1i1iI + I1II1
+ def gen_unique_name ( self ) :
+  ii1Ii = self . realnames . values ( ) + self . bogusnames
+  if 75 - 75: i11iIiiIii + iII1iII1i1iiI . oOoO0oo0OOOo * I1II1
+  if 59 - 59: iIii1I11I1II1
+  I11iii11IIi = ""
+  while 1 :
+   I11iii11IIi += self . gen_name ( )
+   if I11iii11IIi not in ii1Ii :
+    break
+  return I11iii11IIi
+  if 93 - 93: I1II1 * i11iIiiIii * oOooOoO0Oo0O % I1II1 * I1II1 * i11i
+  if 79 - 79: iII1iII1i1iiI
+ def gen_name ( ) :
+  if random . choice ( ( True , False ) ) :
+   if 86 - 86: i11ii11iIi11i % oOooOoO0Oo0O
+   oo = ( "i" , "I" , "1" )
+  else :
+   if 33 - 33: i11i * I11i11Ii - oOoO0oo0OOOo * iIii1I11I1II1 * OoooooooOO * iiI11iii111
+   oo = ( "o" , "O" , "0" )
+   if 27 - 27: i1iIi11iIIi1I
+   if 73 - 73: oOoO0oo0OOOo - I11i11Ii
+  oo0O000OoO = random . choice ( oo [ : 2 ] )
+  for i1iiIIiiI111 in range ( random . randint ( 1 , 12 ) ) :
+   oo0O000OoO += random . choice ( oo )
+  return oo0O000OoO
+ gen_name = staticmethod ( gen_name )
+ if 62 - 62: i11iIiiIii - i11i
+ if 43 - 43: i11ii11iIi11i - i1IIi + iiIIIII1i1iI + OOo
+ if 17 - 17: oOoO0oo0OOOo
+class o00ooooO0oO :
+ def __init__ ( self , symtabs , argnames ) :
+  if 63 - 63: i11ii11iIi11i % i1IIi
+  self . symtabs = symtabs
+  self . mysymbs = { }
+  for o0oOo0Ooo0O in argnames :
+   self . mysymbs [ o0oOo0Ooo0O ] = symtable . Symbol ( o0oOo0Ooo0O , symtable . DEF_PARAM )
+   if 81 - 81: IiiI * iII1iII1i1iiI * I1Ii111 - I1II1 - oOoO0oo0OOOo
+   if 90 - 90: i11i + Iii1ii1II11i / oOoO0oo0OOOo % i11i - O0
+ def lookup ( self , name ) :
+  iIii1 = self . mysymbs . get ( name )
+  if iIii1 :
+   return iIii1
+  else :
+   if 71 - 71: i1iIi11iIIi1I
+   if 55 - 55: i1iIi11iIIi1I / IiiI * I1iII1iiII
+   if 86 - 86: i11iIiiIii + OOo + iiI11iii111 * I1Ii111 + oOoO0oo0OOOo
+   try :
+    return self . symtabs [ - 1 ] . lookup ( name )
+   except KeyError :
+    return self . symtabs [ 0 ] . lookup ( name )
+    if 61 - 61: i1iIi11iIIi1I / i11iIiiIii
+    if 34 - 34: OoooooooOO + iIii1I11I1II1 + i11iIiiIii - IiiI + i11iIiiIii
+ def get_type ( self ) :
+  return self . symtabs [ - 1 ] . get_type ( )
+  if 65 - 65: i11ii11iIi11i
+  if 6 - 6: oOooOoO0Oo0O / I11i11Ii % OOo
+ def is_lambda_arg ( self , id ) :
+  return self . mysymbs . has_key ( id )
+  if 84 - 84: i11iIiiIii . oOoO0oo0OOOo
+  if 100 - 100: OOo - OOo - iiIIIII1i1iI
+class ii1 :
+ def __init__ ( self , source_no_encoding , pubapi ) :
+  if 57 - 57: OOo % OoooooooOO
+  self . pubapi = pubapi
+  if 61 - 61: I1II1 . iIii1I11I1II1 * oOooOoO0Oo0O . iiI11iii111 % I11i11Ii
+  self . modnames = [ ]
+  self . symtab = symtable . symtable ( source_no_encoding , "-" , "exec" )
+  oOo00Oo00O = parser . suite ( source_no_encoding )
+  iI11i1I1 = parser . ast2tuple ( oOo00Oo00O , line_info = 1 )
+  self . names = { }
+  self . walk ( iI11i1I1 , [ self . symtab ] )
+  if 71 - 71: iiI11iii111 % I1II1 / oOoO0oo0OOOo
+  if 49 - 49: i11i % I1II1 * O0
+  if 89 - 89: Iii1ii1II11i + I11i11Ii
+ def getNames ( self ) :
+  return self . names
+  if 3 - 3: i1IIi / oOooOoO0Oo0O % I1Ii111 * i11iIiiIii / O0 * I1Ii111
+  if 49 - 49: Iii1ii1II11i % OOo + i1IIi . oOooOoO0Oo0O % IiiI
+ def addToNames ( self , line , name , doreplace ) :
+  I1i1iii = self . names . get ( line , { } )
+  if not I1i1iii :
+   self . names [ line ] = I1i1iii
+   if 20 - 20: oOoO0oo0OOOo
+  oO00 = I1i1iii . get ( name , [ ] )
+  if not oO00 :
+   I1i1iii [ name ] = oO00
+   if 53 - 53: OoooooooOO . i1IIi
+  oO00 . append ( doreplace )
+  if 18 - 18: oOoO0oo0OOOo
+  if 28 - 28: I1iII1iiII - iII1iII1i1iiI . iII1iII1i1iiI + i11ii11iIi11i - OoooooooOO + O0
+ def res_name ( self , name ) :
+  if name . startswith ( "__" ) and name . endswith ( "__" ) :
+   return 1
+  if name in self . modnames :
+   return 1
+  if hasattr ( __builtins__ , name ) :
+   return 1
+  return 0
+  if 95 - 95: i1iIi11iIIi1I % Iii1ii1II11i . O0
+  if 15 - 15: iiI11iii111 / OOo . OOo - i1IIi
+ def walk ( self , elements , symtabs ) :
+  if 53 - 53: iII1iII1i1iiI + oOooOoO0Oo0O * Iii1ii1II11i
+  if type ( elements ) != types . TupleType :
+   return
+  if token . ISTERMINAL ( elements [ 0 ] ) :
+   return
+   if 61 - 61: i1IIi * I1iII1iiII / OoooooooOO . i11iIiiIii . i11ii11iIi11i
+  o00O = elements [ 0 ]
+  if o00O == symbol . funcdef :
+   self . handle_funcdef ( elements , symtabs )
+  elif o00O == symbol . varargslist :
+   self . handle_varargslist ( elements , symtabs )
+  elif o00O == symbol . fpdef :
+   self . handle_fpdef ( elements , symtabs )
+  elif o00O == symbol . import_as_name :
+   self . handle_import_as_name ( elements , symtabs )
+  elif o00O == symbol . dotted_as_name :
+   self . handle_dotted_as_name ( elements , symtabs )
+  elif o00O == symbol . dotted_name :
+   self . handle_dotted_name ( elements , symtabs )
+  elif o00O == symbol . global_stmt :
+   self . handle_global_stmt ( elements , symtabs )
+  elif o00O == symbol . atom :
+   self . handle_atom ( elements , symtabs )
+  elif o00O == symbol . trailer :
+   self . handle_trailer ( elements , symtabs )
+  elif o00O == symbol . classdef :
+   self . handle_classdef ( elements , symtabs )
+  elif o00O == symbol . argument :
+   self . handle_argument ( elements , symtabs )
+  elif o00O == symbol . lambdef :
+   self . handle_lambdef ( elements , symtabs )
+  elif o00O == symbol . decorator :
+   self . handle_decorator ( elements , symtabs )
+  else :
+   for OOO0OOO00oo in elements :
+    self . walk ( OOO0OOO00oo , symtabs )
+    if 31 - 31: i11i - I1iII1iiII . iiIIIII1i1iI % i11ii11iIi11i - O0
+    if 4 - 4: i11i / iiI11iii111 . I1II1
+ def mangle_name ( self , symtabs , name ) :
+  if self . res_name ( name ) :
+   return name
+   if 58 - 58: I1iII1iiII * i11iIiiIii / i11ii11iIi11i % iiIIIII1i1iI - IiiI / Iii1ii1II11i
+  if not name . startswith ( "__" ) :
+   return name
+   if 50 - 50: oOooOoO0Oo0O
+  for Ii1i11IIii1I in xrange ( len ( symtabs ) ) :
+   OOOoO0O0o = symtabs [ - 1 - Ii1i11IIii1I ]
+   O0o0Ooo = OOOoO0O0o . get_type ( )
+   if O0o0Ooo == "class" :
+    O00 = OOOoO0O0o . get_name ( ) . lstrip ( "_" )
+    return "_" + O00 + name
+    if 47 - 47: I1II1
+  return name
+  if 50 - 50: i11i - iiI11iii111 * IiiI / iiIIIII1i1iI + oOoO0oo0OOOo
+ def should_obfuscate ( self , id , symtabs ) :
+  if 88 - 88: OOo / iiIIIII1i1iI + I1II1 - i11i / iiI11iii111 - i11ii11iIi11i
+  if 15 - 15: IiiI + i11ii11iIi11i - OoooooooOO / I1iII1iiII
+  if 58 - 58: i11iIiiIii % I1Ii111
+  if 71 - 71: I1iII1iiII + iiI11iii111 % i11iIiiIii + IiiI - iII1iII1i1iiI
+  OOOoO0O0o = symtabs [ - 1 ]
+  if 88 - 88: i11ii11iIi11i - i1iIi11iIIi1I % I1iII1iiII
+  if 16 - 16: oOooOoO0Oo0O * Iii1ii1II11i % iII1iII1i1iiI
+  if self . res_name ( id ) :
+   return False
+   if 86 - 86: oOooOoO0Oo0O + OOo % i11iIiiIii * Iii1ii1II11i . iiI11iii111 * I1Ii111
+   if 44 - 44: Iii1ii1II11i
+   if 88 - 88: iiIIIII1i1iI % OOo . i11i
+  iI1ii1Ii = id
+  id = self . mangle_name ( symtabs , id )
+  try :
+   oooo000 = OOOoO0O0o . lookup ( id )
+  except Exception :
+   return False
+   if 16 - 16: IiiI + i1iIi11iIIi1I - i11i
+   if 85 - 85: i11ii11iIi11i + i1IIi
+   if 58 - 58: i11i * I1iII1iiII * IiiI / I1iII1iiII
+  oO0o0OOOO = [ ]
+  if id in oO0o0OOOO :
+   print >> sys . stderr , "%s:" % id
+   print >> sys . stderr , "  Imported:" , oooo000 . is_imported ( )
+   print >> sys . stderr , "  Parameter:" , oooo000 . is_parameter ( )
+   print >> sys . stderr , "  Global:" , oooo000 . is_global ( )
+   print >> sys . stderr , "  Local:" , oooo000 . is_local ( )
+   if 68 - 68: I1II1 - iiIIIII1i1iI - oOooOoO0Oo0O - IiiI + I1Ii111
+   if 10 - 10: OoooooooOO % iIii1I11I1II1
+  if oooo000 . is_imported ( ) :
+   return False
+   if 54 - 54: iiIIIII1i1iI - i11i % i11ii11iIi11i % I1Ii111 % iIii1I11I1II1 + iiI11iii111
+   if 15 - 15: I1Ii111 * iiI11iii111 * I11i11Ii % i11iIiiIii % i11ii11iIi11i - I1iII1iiII
+   if 68 - 68: iiIIIII1i1iI % i1IIi . iII1iII1i1iiI . IiiI
+  if oooo000 . is_parameter ( ) :
+   if 92 - 92: I1II1 . iiIIIII1i1iI
+   if 31 - 31: iiIIIII1i1iI . i11ii11iIi11i / O0
+   if isinstance ( OOOoO0O0o , o00ooooO0oO ) :
+    if OOOoO0O0o . is_lambda_arg ( id ) :
+     return True
+     if 89 - 89: i11ii11iIi11i
+   return False
+   if 68 - 68: i1iIi11iIIi1I * OoooooooOO % O0 + i1iIi11iIIi1I + iiI11iii111
+   if 4 - 4: iiI11iii111 + O0 * I1iII1iiII
+   if 55 - 55: I11i11Ii + iIii1I11I1II1 / i11ii11iIi11i * Iii1ii1II11i - i11iIiiIii - OOo
+   if 25 - 25: IiiI
+   if 7 - 7: i1IIi / oOooOoO0Oo0O * iiIIIII1i1iI . iII1iII1i1iiI . iIii1I11I1II1
+  if isinstance ( OOOoO0O0o , o00ooooO0oO ) :
+   while True :
+    symtabs = symtabs [ : - 1 ]
+    if symtabs == [ ] :
+     raise RuntimeError ( "Lambda symbol '%s' is not present on any scope" % id )
+     if 13 - 13: I1iII1iiII / i11iIiiIii
+    if id in symtabs [ - 1 ] . get_identifiers ( ) :
+     return self . should_obfuscate ( iI1ii1Ii , symtabs )
+     if 2 - 2: oOooOoO0Oo0O / O0 / oOoO0oo0OOOo % i11ii11iIi11i % OOo
+     if 52 - 52: oOoO0oo0OOOo
+     if 95 - 95: OOo
+  if oooo000 . is_global ( ) :
+   O0oOO0O = symtabs [ 0 ]
+   if 91 - 91: O0
+   if 61 - 61: i11i
+   if 64 - 64: iiI11iii111 / i11ii11iIi11i - O0 - I1Ii111
+   if 86 - 86: I1Ii111 % i11ii11iIi11i / oOooOoO0Oo0O / i11ii11iIi11i
+   if 42 - 42: i1iIi11iIIi1I
+   if 67 - 67: iiIIIII1i1iI . I1II1 . O0
+   if id not in O0oOO0O . get_identifiers ( ) :
+    return False
+    if 10 - 10: IiiI % IiiI - iIii1I11I1II1 / I1iII1iiII + OOo
+   OOOOoOoo0O0O0 = O0oOO0O . lookup ( id )
+   if 85 - 85: Iii1ii1II11i % i11iIiiIii - I1II1 * OoooooooOO / oOooOoO0Oo0O % oOooOoO0Oo0O
+   if 1 - 1: i1iIi11iIIi1I - Iii1ii1II11i . I1Ii111 . i1iIi11iIIi1I / I11i11Ii + I1Ii111
+   if id in oO0o0OOOO :
+    print >> sys . stderr , "  Imported (G):" , OOOOoOoo0O0O0 . is_imported ( )
+    print >> sys . stderr , "  Parameter (G):" , OOOOoOoo0O0O0 . is_parameter ( )
+    print >> sys . stderr , "  Global (G):" , OOOOoOoo0O0O0 . is_global ( )
+    print >> sys . stderr , "  Local (G):" , OOOOoOoo0O0O0 . is_local ( )
+    if 78 - 78: O0 . Iii1ii1II11i . i11i % I1iII1iiII
+    if 49 - 49: OOo / i1iIi11iIIi1I . i11i
+   if OOOOoOoo0O0O0 . is_imported ( ) :
+    return False
+    if 68 - 68: i11iIiiIii % IiiI + i11iIiiIii
+    if 31 - 31: i11i . oOooOoO0Oo0O
+    if 1 - 1: I11i11Ii / oOoO0oo0OOOo % I1II1 * iII1iII1i1iiI . i11iIiiIii
+    if 2 - 2: IiiI * I1Ii111 - iIii1I11I1II1 + oOooOoO0Oo0O . Iii1ii1II11i % I1II1
+    if 92 - 92: I1II1
+    if 25 - 25: I11i11Ii - oOooOoO0Oo0O / OoooooooOO / oOoO0oo0OOOo
+    if 12 - 12: oOooOoO0Oo0O * I1II1 % i1IIi % iIii1I11I1II1
+    if 20 - 20: I1iII1iiII % OOo / OOo + OOo
+    if 45 - 45: Iii1ii1II11i - iII1iII1i1iiI - OoooooooOO - i1iIi11iIIi1I . i11i / O0
+    if 51 - 51: O0 + I1II1
+    if 8 - 8: Iii1ii1II11i * i11ii11iIi11i - OOo - i1iIi11iIIi1I * I1iII1iiII % oOooOoO0Oo0O
+    if 48 - 48: O0
+   if not OOOOoOoo0O0O0 . is_local ( ) :
+    return False
+    if 11 - 11: I1Ii111 + OoooooooOO - i1iIi11iIIi1I / oOoO0oo0OOOo + I11i11Ii . i11i
+    if 41 - 41: OOo - O0 - O0
+    if 68 - 68: I1iII1iiII % iiIIIII1i1iI
+   return id not in self . pubapi
+   if 88 - 88: iIii1I11I1II1 - iiI11iii111 + I1iII1iiII
+   if 40 - 40: oOooOoO0Oo0O * OOo + I1iII1iiII % I1II1
+   if 74 - 74: Iii1ii1II11i - I11i11Ii + OoooooooOO + iiIIIII1i1iI / i11ii11iIi11i
+  if not oooo000 . is_local ( ) :
+   if 23 - 23: O0
+   if len ( symtabs ) <= 2 :
+    raise RuntimeError ( "Symbol '%s' is not present on any scope" % id )
+   return self . should_obfuscate ( iI1ii1Ii , symtabs [ : - 1 ] )
+   if 85 - 85: OOo
+   if 84 - 84: oOooOoO0Oo0O . iIii1I11I1II1 % OoooooooOO + OOo % OoooooooOO % i1iIi11iIIi1I
+   if 42 - 42: i1iIi11iIIi1I / I1Ii111 / oOoO0oo0OOOo + I1II1 / i11ii11iIi11i
+  O0o0Ooo = OOOoO0O0o . get_type ( )
+  if O0o0Ooo == "module" :
+   if 84 - 84: iiI11iii111 * i11i + I11i11Ii
+   return id not in self . pubapi
+  elif O0o0Ooo == "function" :
+   if 53 - 53: I1II1 % i11i . iII1iII1i1iiI - iIii1I11I1II1 - iII1iII1i1iiI * i11i
+   return True
+  elif O0o0Ooo == "class" :
+   if 77 - 77: iIii1I11I1II1 * i1iIi11iIIi1I
+   if 95 - 95: oOooOoO0Oo0O + i11iIiiIii
+   if 6 - 6: iiI11iii111 / i11iIiiIii + I1II1 * Iii1ii1II11i
+   if 80 - 80: i11i
+   return False
+  else :
+   raise RuntimeError ( "Unknown scope '%s' for symbol '%s'" % ( O0o0Ooo , id ) )
+   if 83 - 83: I1Ii111 . i11iIiiIii + i11i . oOoO0oo0OOOo * I1Ii111
+ def handle_funcdef ( self , elements , symtabs ) :
+  if 53 - 53: i11i
+  if 31 - 31: i1iIi11iIIi1I
+  if 80 - 80: iiIIIII1i1iI . i11iIiiIii - oOoO0oo0OOOo
+  I11iii11IIi = elements [ 2 ]
+  assert I11iii11IIi [ 0 ] == token . NAME
+  id = I11iii11IIi [ 1 ]
+  iIiIIi1 = I11iii11IIi [ 2 ]
+  I1IIII1i = self . should_obfuscate ( id , symtabs )
+  if 2 - 2: I1Ii111 + OOo - oOooOoO0Oo0O % oOoO0oo0OOOo . I1II1
+  self . addToNames ( iIiIIi1 , id , I1IIII1i )
+  if 18 - 18: I1iII1iiII + I1II1 - OOo . i11i + i11iIiiIii
+  OOOoO0O0o = symtabs [ - 1 ]
+  if 20 - 20: iiIIIII1i1iI
+  iI1ii1Ii = id
+  id = self . mangle_name ( symtabs , id )
+  if 52 - 52: i11i - OoooooooOO % OOo + oOooOoO0Oo0O * I11i11Ii . iII1iII1i1iiI
+  O0OO0O = OOOoO0O0o . lookup ( id ) . get_namespaces ( )
+  if 81 - 81: Iii1ii1II11i . oOoO0oo0OOOo % O0 / oOooOoO0Oo0O - Iii1ii1II11i
+  if 43 - 43: i11iIiiIii + I11i11Ii * i11i * iiIIIII1i1iI * O0
+  if 64 - 64: I1iII1iiII % iIii1I11I1II1 * Iii1ii1II11i
+  if len ( O0OO0O ) == 0 :
+   O0OO0O = [ ]
+   for o0 in OOOoO0O0o . get_children ( ) :
+    if o0 . get_name ( ) == iI1ii1Ii :
+     O0OO0O . append ( o0 )
+     if 37 - 37: Iii1ii1II11i - iiIIIII1i1iI % I11i11Ii
+  for OOO0OOO00oo in elements :
+   self . walk ( OOO0OOO00oo , symtabs + O0OO0O )
+   if 77 - 77: I11i11Ii - i1IIi - I1Ii111 . i11ii11iIi11i
+   if 39 - 39: i11i / iiI11iii111 + iiIIIII1i1iI / i11ii11iIi11i
+ def handle_varargslist ( self , elements , symtabs ) :
+  if 13 - 13: iII1iII1i1iiI + O0 + I1II1 % oOooOoO0Oo0O / oOoO0oo0OOOo . iII1iII1i1iiI
+  if 86 - 86: Iii1ii1II11i * oOoO0oo0OOOo % i1IIi . OOo . i11iIiiIii
+  if 56 - 56: IiiI % O0 - oOooOoO0Oo0O
+  if 100 - 100: OOo - O0 % Iii1ii1II11i * I1iII1iiII + oOooOoO0Oo0O
+  if 88 - 88: OoooooooOO - i1iIi11iIIi1I * O0 * OoooooooOO . OoooooooOO
+  OOOoO0O0o = symtabs [ - 1 ]
+  if 33 - 33: iiIIIII1i1iI + I1II1 * Iii1ii1II11i / iIii1I11I1II1 - oOooOoO0Oo0O
+  for O0oO in elements :
+   if type ( O0oO ) != types . TupleType :
+    continue
+    if 73 - 73: IiiI * i11iIiiIii % Iii1ii1II11i . IiiI
+   OOOOo0 = O0oO [ 0 ]
+   if OOOOo0 == symbol . test :
+    if 49 - 49: i11i % O0 . i11ii11iIi11i + Iii1ii1II11i / oOooOoO0Oo0O
+    for OOO0OOO00oo in O0oO :
+     if 72 - 72: iiI11iii111 * I11i11Ii . oOooOoO0Oo0O - i11i + i1IIi
+     if 10 - 10: Iii1ii1II11i + i1IIi
+     self . walk ( OOO0OOO00oo , symtabs [ : - 1 ] )
+   elif OOOOo0 == token . NAME :
+    if 87 - 87: oOooOoO0Oo0O
+    if 58 - 58: i11ii11iIi11i % oOoO0oo0OOOo
+    if 50 - 50: iiIIIII1i1iI . oOoO0oo0OOOo
+    if 97 - 97: O0 + i11ii11iIi11i
+    if 89 - 89: oOoO0oo0OOOo + i1iIi11iIIi1I * I1Ii111 * OOo
+    if 37 - 37: OoooooooOO - O0 - oOoO0oo0OOOo
+    id = O0oO [ 1 ]
+    iIiIIi1 = O0oO [ 2 ]
+    I1IIII1i = self . should_obfuscate ( id , symtabs )
+    self . addToNames ( iIiIIi1 , id , I1IIII1i )
+   elif OOOOo0 == symbol . fpdef :
+    self . handle_fpdef ( O0oO , symtabs )
+   else :
+    assert ( OOOOo0 in [ token . STAR , token . DOUBLESTAR ,
+ token . COMMA , token . EQUAL ] )
+    if 77 - 77: I1iII1iiII * iIii1I11I1II1
+ def handle_fpdef ( self , elements , symtabs ) :
+  if 98 - 98: oOooOoO0Oo0O % OOo * OoooooooOO
+  if 51 - 51: iIii1I11I1II1 . i11ii11iIi11i / Iii1ii1II11i + oOoO0oo0OOOo
+  if 33 - 33: iiI11iii111 . i11i % I1II1 + oOoO0oo0OOOo
+  I11iii11IIi = elements [ 1 ]
+  assert I11iii11IIi [ 0 ] == token . NAME
+  id = I11iii11IIi [ 1 ]
+  iIiIIi1 = I11iii11IIi [ 2 ]
+  I1IIII1i = self . should_obfuscate ( id , symtabs )
+  if 71 - 71: I11i11Ii % I1iII1iiII
+  self . addToNames ( iIiIIi1 , id , I1IIII1i )
+  for OOO0OOO00oo in elements :
+   self . walk ( OOO0OOO00oo , symtabs )
+   if 98 - 98: I1Ii111 % i11iIiiIii % iiI11iii111 + OOo
+   if 78 - 78: IiiI % Iii1ii1II11i / I1II1 - iIii1I11I1II1
+ def handle_import_as_name ( self , elements , symtabs ) :
+  if 69 - 69: iiIIIII1i1iI
+  if 11 - 11: oOooOoO0Oo0O
+  if 16 - 16: OOo + iII1iII1i1iiI * O0 % i1IIi . oOooOoO0Oo0O
+  if 67 - 67: OoooooooOO / oOooOoO0Oo0O * OOo + I1Ii111
+  if 65 - 65: OoooooooOO - IiiI / iiI11iii111 / i11i / i1IIi
+  o00oo0 = elements [ 1 ]
+  assert o00oo0 [ 0 ] == token . NAME
+  I11ii1IIiIi = o00oo0 [ 1 ]
+  OoOOo0OOoO = o00oo0 [ 2 ]
+  self . addToNames ( OoOOo0OOoO , I11ii1IIiIi , 0 )
+  if 72 - 72: OOo
+  if len ( elements ) > 2 :
+   assert len ( elements ) == 4
+   if 1 - 1: i1iIi11iIIi1I * iII1iII1i1iiI * OoooooooOO + iiI11iii111
+   IiII111i1i11 = elements [ 2 ]
+   assert IiII111i1i11 [ 0 ] == token . NAME
+   i111iIi1i1II1 = IiII111i1i11 [ 1 ]
+   assert i111iIi1i1II1 == "as"
+   oooO = IiII111i1i11 [ 2 ]
+   self . addToNames ( oooO , i111iIi1i1II1 , 0 )
+   if 26 - 26: OOo % IiiI
+   o00Oo0oooooo = elements [ 3 ]
+   assert o00Oo0oooooo [ 0 ] == token . NAME
+   O0oO0 = o00Oo0oooooo [ 1 ]
+   iII11 = o00Oo0oooooo [ 2 ]
+   if 32 - 32: iiIIIII1i1iI
+   self . addToNames ( iII11 , O0oO0 , 0 )
+   self . modnames . append ( O0oO0 )
+   if 30 - 30: iIii1I11I1II1 / I1Ii111 . i1iIi11iIIi1I - oOoO0oo0OOOo
+  for OOO0OOO00oo in elements :
+   self . walk ( OOO0OOO00oo , symtabs )
+   if 48 - 48: i1IIi - OOo / O0 * i1iIi11iIIi1I
+   if 71 - 71: IiiI
+ def handle_dotted_as_name ( self , elements , symtabs ) :
+  if 7 - 7: IiiI - oOooOoO0Oo0O . iIii1I11I1II1 - i1IIi
+  if 59 - 59: oOoO0oo0OOOo
+  if 81 - 81: i11ii11iIi11i - i11ii11iIi11i . I1II1
+  if 73 - 73: I1Ii111 % i11iIiiIii - oOooOoO0Oo0O
+  if 7 - 7: O0 * i11iIiiIii * OOo + iiI11iii111 % i1iIi11iIIi1I - iiI11iii111
+  if 39 - 39: I11i11Ii * I1iII1iiII % I1iII1iiII - OoooooooOO + oOoO0oo0OOOo - I1Ii111
+  ii = elements [ 1 ]
+  if 68 - 68: I1II1 - oOooOoO0Oo0O / iiIIIII1i1iI / I1Ii111
+  I11iiii = ii [ 1 ]
+  assert I11iiii [ 0 ] == token . NAME
+  O0i1iI = I11iiii [ 1 ]
+  IiI1iiiIii = I11iiii [ 2 ]
+  self . addToNames ( IiI1iiiIii , O0i1iI , 0 )
+  self . modnames . append ( O0i1iI )
+  if 7 - 7: iiIIIII1i1iI * i1iIi11iIIi1I - iiI11iii111 + I1iII1iiII * oOooOoO0Oo0O % i1iIi11iIIi1I
+  if len ( elements ) > 2 :
+   if 15 - 15: i11ii11iIi11i % oOooOoO0Oo0O * I1Ii111
+   assert len ( elements ) == 4
+   if 81 - 81: iiI11iii111 - iIii1I11I1II1 - i1IIi / iiIIIII1i1iI - O0 * I1Ii111
+   iI1i11II1i = elements [ 2 ]
+   assert iI1i11II1i [ 0 ] == token . NAME
+   o0o0OoOo0O0OO = iI1i11II1i [ 1 ]
+   assert o0o0OoOo0O0OO == "as"
+   iIi1I11I = iI1i11II1i [ 2 ]
+   self . addToNames ( iIi1I11I , o0o0OoOo0O0OO , 0 )
+   if 42 - 42: iIii1I11I1II1 / iiIIIII1i1iI / i1iIi11iIIi1I - OoooooooOO
+   I11iii11IIi = elements [ 3 ]
+   assert I11iii11IIi [ 0 ] == token . NAME
+   id = I11iii11IIi [ 1 ]
+   iIiIIi1 = I11iii11IIi [ 2 ]
+   if 33 - 33: i11ii11iIi11i * I1iII1iiII - i11i
+   self . addToNames ( iIiIIi1 , id , 0 )
+   self . modnames . append ( id )
+   if 83 - 83: i11ii11iIi11i - OOo / I1Ii111 / iiIIIII1i1iI + Iii1ii1II11i - O0
+  for OOO0OOO00oo in elements :
+   self . walk ( OOO0OOO00oo , symtabs )
+   if 4 - 4: I1iII1iiII * i1iIi11iIIi1I % i1IIi * i11iIiiIii % I11i11Ii - Iii1ii1II11i
+   if 67 - 67: i11ii11iIi11i + IiiI . oOoO0oo0OOOo . i11i
+ def handle_dotted_name ( self , elements , symtabs ) :
+  if 98 - 98: I1II1
+  if 68 - 68: iIii1I11I1II1 * iIii1I11I1II1 . oOoO0oo0OOOo / i11i % I11i11Ii
+  if 38 - 38: iiI11iii111 - I1iII1iiII / I1II1
+  if 66 - 66: O0 % IiiI + i11iIiiIii . i11ii11iIi11i / OOo + IiiI
+  if 86 - 86: oOoO0oo0OOOo
+  if 5 - 5: iII1iII1i1iiI * i11ii11iIi11i
+  if 5 - 5: iiIIIII1i1iI
+  I11iii11IIi = elements [ 1 ]
+  assert I11iii11IIi [ 0 ] == token . NAME
+  id = I11iii11IIi [ 1 ]
+  iIiIIi1 = I11iii11IIi [ 2 ]
+  self . addToNames ( iIiIIi1 , id , 0 )
+  if 90 - 90: iiIIIII1i1iI . iiI11iii111 / OOo - I1Ii111
+  if 40 - 40: OoooooooOO
+  assert ( len ( elements ) % 2 == 0 )
+  for i1iiIIiiI111 in range ( 2 , len ( elements ) , 2 ) :
+   I1i1i1 = elements [ i1iiIIiiI111 ]
+   I11iii11IIi = elements [ i1iiIIiiI111 + 1 ]
+   if 73 - 73: O0 * I1II1 + OOo + iiI11iii111
+   assert I1i1i1 [ 0 ] == token . DOT
+   assert I11iii11IIi [ 0 ] == token . NAME
+   id = I11iii11IIi [ 1 ]
+   iIiIIi1 = I11iii11IIi [ 2 ]
+   self . addToNames ( iIiIIi1 , id , 0 )
+  for OOO0OOO00oo in elements :
+   self . walk ( OOO0OOO00oo , symtabs )
+   if 40 - 40: i11i . i11ii11iIi11i * iiIIIII1i1iI + I1iII1iiII + I1iII1iiII
+   if 9 - 9: I1Ii111 % OoooooooOO . Iii1ii1II11i % I1Ii111
+ def handle_global_stmt ( self , elements , symtabs ) :
+  if 32 - 32: i11iIiiIii
+  if 31 - 31: iIii1I11I1II1 / i1iIi11iIIi1I / IiiI
+  if 41 - 41: I11i11Ii
+  if 10 - 10: I11i11Ii / I11i11Ii / iiIIIII1i1iI . iiIIIII1i1iI
+  if 98 - 98: I11i11Ii / oOooOoO0Oo0O . O0 + i1iIi11iIIi1I
+  iiIiii1iI1i = elements [ 1 ]
+  assert iiIiii1iI1i [ 0 ] == token . NAME
+  I1ii1ii11i1I = iiIiii1iI1i [ 1 ]
+  assert I1ii1ii11i1I == "global"
+  if 58 - 58: I1II1 + I11i11Ii
+  o00oo0 = elements [ 2 ]
+  assert o00oo0 [ 0 ] == token . NAME
+  I11ii1IIiIi = o00oo0 [ 1 ]
+  OoOOo0OOoO = o00oo0 [ 2 ]
+  I1IIII1i = self . should_obfuscate ( I11ii1IIiIi , symtabs )
+  self . addToNames ( OoOOo0OOoO , I11ii1IIiIi , I1IIII1i )
+  if 12 - 12: oOoO0oo0OOOo - IiiI % i11ii11iIi11i * I1Ii111
+  if 44 - 44: I1II1 % OOo
+  assert ( len ( elements ) % 2 )
+  for i1iiIIiiI111 in range ( 3 , len ( elements ) , 2 ) :
+   iiI11i1II = elements [ i1iiIIiiI111 ]
+   I11iii11IIi = elements [ i1iiIIiiI111 + 1 ]
+   assert iiI11i1II [ 0 ] == token . COMMA
+   assert I11iii11IIi [ 0 ] == token . NAME
+   id = I11iii11IIi [ 1 ]
+   iIiIIi1 = I11iii11IIi [ 2 ]
+   I1IIII1i = id not in self . pubapi
+   self . addToNames ( iIiIIi1 , id , I1IIII1i )
+  for OOO0OOO00oo in elements :
+   self . walk ( OOO0OOO00oo , symtabs )
+   if 51 - 51: oOoO0oo0OOOo % I11i11Ii % oOoO0oo0OOOo * O0 - I1iII1iiII % I11i11Ii
+   if 65 - 65: iiI11iii111
+ def handle_atom ( self , elements , symtabs ) :
+  if 68 - 68: iiI11iii111 % i11iIiiIii + i11i
+  if 52 - 52: IiiI - I11i11Ii + IiiI % oOoO0oo0OOOo
+  if 35 - 35: iIii1I11I1II1
+  I11iii11IIi = elements [ 1 ]
+  if I11iii11IIi [ 0 ] == token . NAME :
+   id = I11iii11IIi [ 1 ]
+   iIiIIi1 = I11iii11IIi [ 2 ]
+   I1IIII1i = self . should_obfuscate ( id , symtabs )
+   if 42 - 42: iiIIIII1i1iI . oOooOoO0Oo0O . i1IIi + i11ii11iIi11i + I1iII1iiII + oOooOoO0Oo0O
+   self . addToNames ( iIiIIi1 , id , I1IIII1i )
+   if 31 - 31: I1II1 . I1iII1iiII - iiI11iii111 . OoooooooOO / OoooooooOO
+  for OOO0OOO00oo in elements :
+   self . walk ( OOO0OOO00oo , symtabs )
+   if 56 - 56: i1iIi11iIIi1I / Iii1ii1II11i / i11iIiiIii + OoooooooOO - I11i11Ii - I1Ii111
+   if 21 - 21: O0 % iII1iII1i1iiI . oOooOoO0Oo0O / i11i + iII1iII1i1iiI
+ def handle_trailer ( self , elements , symtabs ) :
+  if 53 - 53: Iii1ii1II11i - oOooOoO0Oo0O - Iii1ii1II11i * I1II1
+  if 71 - 71: O0 - iIii1I11I1II1
+  if 12 - 12: I1iII1iiII / oOoO0oo0OOOo
+  iiI1I1 = elements [ 1 ]
+  if iiI1I1 [ 0 ] == token . DOT :
+   I11iii11IIi = elements [ 2 ]
+   assert I11iii11IIi [ 0 ] == token . NAME
+   id = I11iii11IIi [ 1 ]
+   iIiIIi1 = I11iii11IIi [ 2 ]
+   if 56 - 56: oOooOoO0Oo0O . O0 + I11i11Ii
+   if 1 - 1: I1II1
+   self . addToNames ( iIiIIi1 , id , 0 )
+  for OOO0OOO00oo in elements :
+   self . walk ( OOO0OOO00oo , symtabs )
+   if 97 - 97: I1iII1iiII + I1II1 + O0 + i11iIiiIii
+   if 77 - 77: oOoO0oo0OOOo / OoooooooOO
+ def handle_classdef ( self , elements , symtabs ) :
+  if 46 - 46: oOoO0oo0OOOo % iIii1I11I1II1 . I1II1 % I1II1 + i11iIiiIii
+  if 72 - 72: iIii1I11I1II1 * OOo % iiI11iii111 / i1iIi11iIIi1I
+  if 35 - 35: iiI11iii111 + i1IIi % IiiI % I1Ii111 + Iii1ii1II11i
+  I11iii11IIi = elements [ 2 ]
+  assert I11iii11IIi [ 0 ] == token . NAME
+  id = I11iii11IIi [ 1 ]
+  iIiIIi1 = I11iii11IIi [ 2 ]
+  I1IIII1i = self . should_obfuscate ( id , symtabs )
+  if 17 - 17: i1IIi
+  self . addToNames ( iIiIIi1 , id , I1IIII1i )
+  if 21 - 21: I11i11Ii
+  I1ii1 = elements [ 3 ]
+  O00Oo0o0000OOoO = elements [ 4 ]
+  if 46 - 46: O0 * i11i - I11i11Ii * iiI11iii111
+  assert I1ii1 [ 0 ] in ( token . COLON , token . LPAR )
+  if I1ii1 [ 0 ] == token . LPAR and O00Oo0o0000OOoO [ 0 ] != token . RPAR :
+   if 33 - 33: OOo
+   OOOoOoO = elements [ 4 ]
+   assert OOOoOoO [ 0 ] == symbol . testlist
+   if 22 - 22: oOooOoO0Oo0O % IiiI
+   for OOO0OOO00oo in OOOoOoO :
+    self . walk ( OOO0OOO00oo , symtabs )
+   elements = elements [ 5 : ]
+   if 57 - 57: I1iII1iiII + O0 . OOo
+  OOOoO0O0o = symtabs [ - 1 ]
+  iIi1i1iIi1iI = OOOoO0O0o . lookup ( id ) . get_namespace ( )
+  if 26 - 26: OoooooooOO * oOooOoO0Oo0O + I1iII1iiII
+  for OOO0OOO00oo in elements :
+   self . walk ( OOO0OOO00oo , symtabs + [ iIi1i1iIi1iI ] )
+   if 24 - 24: i11iIiiIii % iIii1I11I1II1 + I1iII1iiII / i11iIiiIii
+   if 70 - 70: i1iIi11iIIi1I * O0 . I1Ii111 + oOooOoO0Oo0O . iII1iII1i1iiI
+ def handle_argument ( self , elements , symtabs ) :
+  if 14 - 14: iIii1I11I1II1 % iIii1I11I1II1 * i11iIiiIii - i1iIi11iIIi1I - I1Ii111
+  if 63 - 63: i1iIi11iIIi1I
+  if 69 - 69: iIii1I11I1II1 . IiiI % iiI11iii111 + iIii1I11I1II1 / O0 / IiiI
+  if 61 - 61: I1iII1iiII % I1iII1iiII * oOoO0oo0OOOo / oOoO0oo0OOOo
+  if 75 - 75: iII1iII1i1iiI . iiI11iii111
+  if 50 - 50: i11ii11iIi11i
+  if len ( elements ) >= 4 :
+   if 60 - 60: iiI11iii111 * iIii1I11I1II1 * IiiI * I11i11Ii
+   if 69 - 69: OOo * O0 . i11iIiiIii / OOo . oOoO0oo0OOOo
+   if sys . hexversion >= 0x2040000 :
+    keyword = elements [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ]
+   else :
+    keyword = elements [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ] [ 1 ]
+   assert keyword [ 0 ] == token . NAME
+   O0oOOo = keyword [ 1 ]
+   I1II = keyword [ 2 ]
+   if 64 - 64: O0 % I1Ii111 % O0 * i1iIi11iIIi1I . Iii1ii1II11i + oOooOoO0Oo0O
+   if 75 - 75: I1Ii111 . OoooooooOO % oOoO0oo0OOOo * I1Ii111 % OoooooooOO
+   if 13 - 13: iII1iII1i1iiI / i11iIiiIii % i11i % I1Ii111 . IiiI
+   self . addToNames ( I1II , O0oOOo , False )
+   if 8 - 8: i11ii11iIi11i + I11i11Ii - i11i
+   if 11 - 11: i1IIi % i11iIiiIii - i1IIi * i11ii11iIi11i
+   elements = elements [ 3 ]
+   if 39 - 39: iiIIIII1i1iI
+  for OOO0OOO00oo in elements :
+   self . walk ( OOO0OOO00oo , symtabs )
+   if 86 - 86: I1Ii111 * oOooOoO0Oo0O + I1Ii111 + i11i
+   if 8 - 8: iiIIIII1i1iI - I1II1 / iiI11iii111
+ def handle_lambdef ( self , elements , symtabs ) :
+  if 96 - 96: i11ii11iIi11i
+  if 29 - 29: IiiI / i1IIi . oOooOoO0Oo0O - i11ii11iIi11i - i11ii11iIi11i - OOo
+  if 20 - 20: i1IIi % i1iIi11iIIi1I . oOooOoO0Oo0O / iII1iII1i1iiI * i11iIiiIii * I1iII1iiII
+  if 85 - 85: oOoO0oo0OOOo . i11ii11iIi11i / iiI11iii111 . O0 % iiIIIII1i1iI
+  if 90 - 90: I11i11Ii % O0 * iIii1I11I1II1 . I1II1
+  if elements [ 2 ] [ 0 ] == token . COLON :
+   if 8 - 8: iiI11iii111 + i11i / I1II1 / I1Ii111
+   if 74 - 74: O0 / i1IIi
+   if 78 - 78: OoooooooOO . i1iIi11iIIi1I + iiI11iii111 - i1IIi
+   ii1O0 = elements [ 3 ]
+   iII1 = o00ooooO0oO ( symtabs , [ ] )
+   for OOO0OOO00oo in ii1O0 :
+    self . walk ( OOO0OOO00oo , symtabs + [ iII1 ] )
+  else :
+   if 27 - 27: i1iIi11iIIi1I . I1Ii111 + i11ii11iIi11i / iIii1I11I1II1 % I1II1 . iiI11iii111
+   IIIIi1 = elements [ 2 ]
+   if 3 - 3: iiIIIII1i1iI
+   if 45 - 45: iiIIIII1i1iI
+   if 83 - 83: i11ii11iIi11i . OoooooooOO
+   Oo0ooo = self . get_varargs_names ( IIIIi1 )
+   for iIiIIi1 , I11iii11IIi in Oo0ooo :
+    self . addToNames ( iIiIIi1 , I11iii11IIi , 1 )
+    if 28 - 28: Iii1ii1II11i . i11i / IiiI + i11i . OoooooooOO . iII1iII1i1iiI
+   O000OOO0OOo = [ i1i1I111iIi1 [ 1 ] for i1i1I111iIi1 in Oo0ooo ]
+   iII1 = o00ooooO0oO ( symtabs , O000OOO0OOo )
+   if 92 - 92: iiI11iii111
+   if 22 - 22: I11i11Ii % I1II1 * IiiI / I1iII1iiII % i11iIiiIii * I1Ii111
+   ii1O0 = elements [ 4 ]
+   for OOO0OOO00oo in ii1O0 :
+    self . walk ( OOO0OOO00oo , symtabs + [ iII1 ] )
+    if 95 - 95: OoooooooOO - iII1iII1i1iiI * oOooOoO0Oo0O + i11ii11iIi11i
+ def handle_decorator ( self , elements , symtabs ) :
+  if 10 - 10: oOoO0oo0OOOo / i11iIiiIii
+  if 92 - 92: I1Ii111 . iiIIIII1i1iI
+  if 85 - 85: IiiI . iiIIIII1i1iI
+  I11iii11IIi = elements [ 2 ] [ 1 ]
+  assert I11iii11IIi [ 0 ] == token . NAME
+  id = I11iii11IIi [ 1 ]
+  iIiIIi1 = I11iii11IIi [ 2 ]
+  I1IIII1i = self . should_obfuscate ( id , symtabs )
+  if 78 - 78: iiI11iii111 * iiIIIII1i1iI + iIii1I11I1II1 + iIii1I11I1II1 / iiIIIII1i1iI . OOo
+  self . addToNames ( iIiIIi1 , id , I1IIII1i )
+  for OOO0OOO00oo in elements :
+   self . walk ( OOO0OOO00oo , symtabs )
+   if 97 - 97: iiI11iii111 / iiIIIII1i1iI % i1IIi % IiiI
+ def get_varargs_names ( elements ) :
+  oo0O000OoO = [ ]
+  if 18 - 18: iIii1I11I1II1 % I1Ii111
+  if 95 - 95: iiI11iii111 + i11iIiiIii * iiIIIII1i1iI - i1IIi * iiIIIII1i1iI - iIii1I11I1II1
+  oo0o0O0Oooooo = False
+  for O0oO in elements :
+   if type ( O0oO ) != types . TupleType :
+    continue
+    if 1 - 1: iiI11iii111 % i11ii11iIi11i * I11i11Ii
+   OOOOo0 = O0oO [ 0 ]
+   if oo0o0O0Oooooo :
+    assert O0oO [ 0 ] == token . NAME
+    id = O0oO [ 1 ]
+    iIiIIi1 = O0oO [ 2 ]
+    oo0O000OoO . append ( ( iIiIIi1 , id ) )
+    oo0o0O0Oooooo = False
+   elif OOOOo0 in [ token . STAR , token . DOUBLESTAR ] :
+    oo0o0O0Oooooo = True
+   elif OOOOo0 == symbol . fpdef :
+    oo0O000OoO . extend ( ii1 . get_fpdef_names ( O0oO ) )
+    if 55 - 55: i11ii11iIi11i
+  return oo0O000OoO
+  if 87 - 87: OoooooooOO % I1II1 . oOooOoO0Oo0O / iiI11iii111
+ get_varargs_names = staticmethod ( get_varargs_names )
+ if 8 - 8: I1Ii111 + oOoO0oo0OOOo
+ if 90 - 90: IiiI
+ def get_fpdef_names ( elements ) :
+  oo0O000OoO = [ ]
+  if 62 - 62: iiIIIII1i1iI . iII1iII1i1iiI . OoooooooOO
+  if 11 - 11: I1iII1iiII / I1Ii111
+  if 73 - 73: i1IIi / i11iIiiIii
+  if type ( elements ) != types . TupleType :
+   return oo0O000OoO
+  if token . ISTERMINAL ( elements [ 0 ] ) :
+   return oo0O000OoO
+   if 58 - 58: I11i11Ii . i11i + Iii1ii1II11i - i11iIiiIii / i11i / O0
+  I11iii11IIi = elements [ 1 ]
+  assert I11iii11IIi [ 0 ] == token . NAME
+  id = I11iii11IIi [ 1 ]
+  iIiIIi1 = I11iii11IIi [ 2 ]
+  oo0O000OoO . append ( ( iIiIIi1 , id ) )
+  for OOO0OOO00oo in elements :
+   oo0O000OoO . extend ( ii1 . get_fpdef_names ( OOO0OOO00oo ) )
+  return oo0O000OoO
+  if 85 - 85: i11ii11iIi11i + I1iII1iiII
+ get_fpdef_names = staticmethod ( get_fpdef_names )
+ if 10 - 10: iII1iII1i1iiI / i1iIi11iIIi1I + i11ii11iIi11i / i1IIi
+ if 27 - 27: OOo
+ if 67 - 67: oOooOoO0Oo0O
+class OO00OO0O0 :
+ def __init__ ( self , source_no_encoding ) :
+  i1I111Ii1i11 = compiler . parse ( source_no_encoding )
+  self . pubapi = None
+  self . matches = 0
+  compiler . walk ( i1I111Ii1i11 , self )
+  if self . pubapi == None :
+   if 81 - 81: i1iIi11iIIi1I
+   if conf . allpublic :
+    oO0o00oOOooO0 = symtable . symtable ( source_no_encoding , "-" , "exec" )
+    self . pubapi = filter ( lambda oooo000 : oooo000 [ 0 ] != "_" ,
+ oO0o00oOOooO0 . get_identifiers ( ) )
+   else :
+    self . pubapi = [ ]
+    if 79 - 79: i1iIi11iIIi1I - iIii1I11I1II1 + OOo - iiIIIII1i1iI
+  if self . matches > 1 :
+   print >> sys . stderr , "Warning: Found multiple __all__ definitions"
+   print >> sys . stderr , "Using last definition"
+   if 93 - 93: i11i . oOooOoO0Oo0O - I11i11Ii + i11ii11iIi11i
+   if 61 - 61: i11i
+ def visitAssign ( self , node ) :
+  for Ii1ii111i1 in node . nodes :
+   if not isinstance ( Ii1ii111i1 , compiler . ast . AssName ) :
+    continue
+    if 31 - 31: I1iII1iiII + O0
+   if Ii1ii111i1 . name == "__all__" and Ii1ii111i1 . flags == compiler . consts . OP_ASSIGN :
+    if 87 - 87: iiI11iii111
+    self . matches += 1
+    self . pubapi = [ ]
+    if 45 - 45: i1iIi11iIIi1I / OoooooooOO - I1II1 / OOo % iII1iII1i1iiI
+    OoO = isinstance ( node . expr , compiler . ast . List )
+    if OoO :
+     if 14 - 14: i11iIiiIii * I1II1 / i1IIi * iiIIIII1i1iI + i11i % I1II1
+     for node in node . expr . getChildNodes ( ) :
+      if isinstance ( node , compiler . ast . Const ) :
+       self . pubapi . append ( node . value )
+      else :
+       OoO = False
+       break
+       if 51 - 51: i11iIiiIii . IiiI + iII1iII1i1iiI / IiiI
+    if not OoO :
+     print >> sys . stderr , "Error: __all__ is not a list of constants."
+     sys . exit ( 1 )
+     if 35 - 35: iII1iII1i1iiI
+     if 75 - 75: I11i11Ii / IiiI . iII1iII1i1iiI * I1iII1iiII - i11i
+     if 41 - 41: OOo
+class oOOoo0o0OOOO :
+ def __init__ ( self , source , names ) :
+  if 26 - 26: I1II1 % iIii1I11I1II1 + oOoO0oo0OOOo
+  self . indent = 0
+  self . first_on_line = 1
+  if 67 - 67: Iii1ii1II11i + i11i - O0 . Iii1ii1II11i * i11i * I1Ii111
+  self . symboltimes = { }
+  self . names = names
+  if 90 - 90: OOo . iII1iII1i1iiI
+  self . result = { }
+  if 81 - 81: I1iII1iiII - I1Ii111 % iiI11iii111 - i1iIi11iIIi1I / I11i11Ii
+  if 4 - 4: OoooooooOO - i1IIi % OOo - I1iII1iiII * oOoO0oo0OOOo
+  self . this_lineno = 1
+  Ooooo00o0OoO = StringIO . StringIO ( source )
+  self . parse ( Ooooo00o0OoO )
+  if 75 - 75: oOooOoO0Oo0O % i11i
+  if 30 - 30: iII1iII1i1iiI + iiIIIII1i1iI - iII1iII1i1iiI . iII1iII1i1iiI - i11i + O0
+ def parse ( self , f ) :
+  for O0oO in tokenize . generate_tokens ( f . readline ) :
+   oOO0 , i1IIiIii1i , ooOOO0OooOo , I1Ii , oOO = O0oO
+   if 17 - 17: i11i / IiiI % iII1iII1i1iiI + oOooOoO0Oo0O * iiIIIII1i1iI
+   assert self . this_lineno <= ooOOO0OooOo [ 0 ]
+   if self . this_lineno < ooOOO0OooOo [ 0 ] :
+    if 36 - 36: iiIIIII1i1iI * i1iIi11iIIi1I
+    if 23 - 23: I1Ii111 . OoooooooOO - I1iII1iiII + iII1iII1i1iiI . i11i
+    self . this_lineno = ooOOO0OooOo [ 0 ]
+    self . symboltimes = { }
+    if 54 - 54: iiI11iii111
+   if oOO0 in [ tokenize . NL , tokenize . NEWLINE ] :
+    self . this_lineno += 1
+    self . symboltimes = { }
+   elif oOO0 == tokenize . NAME :
+    if 67 - 67: I1iII1iiII . I11i11Ii + i11ii11iIi11i - OoooooooOO
+    if keyword . iskeyword ( i1IIiIii1i ) :
+     continue
+     if 70 - 70: I1iII1iiII / i11i - iIii1I11I1II1 - I1II1
+    Iii = ooOOO0OooOo [ 0 ]
+    iIi1i = ooOOO0OooOo [ 1 ]
+    if 4 - 4: iiIIIII1i1iI / i11iIiiIii / I1iII1iiII
+    I1i1iii = self . names . get ( Iii )
+    if not I1i1iii :
+     raise RuntimeError ( "Overlooked symbol '%s' on line %d column %d" % ( i1IIiIii1i , Iii , iIi1i ) )
+     if 91 - 91: iIii1I11I1II1 % oOoO0oo0OOOo . iIii1I11I1II1 % i1IIi / i11i * i11ii11iIi11i
+    oO00 = I1i1iii . get ( i1IIiIii1i )
+    if not oO00 :
+     raise RuntimeError ( "Overlooked symbol '%s' on line %d column %d" % ( i1IIiIii1i , Iii , iIi1i ) )
+     if 10 - 10: i11i . I1II1
+    I1i = self . saw_symbol ( i1IIiIii1i )
+    if I1i > len ( oO00 ) :
+     raise RuntimeError ( "Overlooked symbol '%s' on line %d column %d" % ( i1IIiIii1i , Iii , iIi1i ) )
+     if 86 - 86: I11i11Ii / Iii1ii1II11i + O0 * I1II1
+    if oO00 [ I1i ] :
+     if 19 - 19: i11i * iII1iII1i1iiI + OOo
+     assert self . result . get ( ( Iii , iIi1i ) ) == None
+     self . result [ ( Iii , iIi1i ) ] = i1IIiIii1i
+     if 65 - 65: I1iII1iiII . iiIIIII1i1iI . i1iIi11iIIi1I . I1II1 - I1iII1iiII
+     if 19 - 19: i11iIiiIii + I1II1 % iiI11iii111
+ def saw_symbol ( self , name ) :
+  I1i = self . symboltimes . get ( name , - 1 )
+  if 14 - 14: i1iIi11iIIi1I . i11i . I1Ii111 / OOo % IiiI - iiI11iii111
+  if 67 - 67: I1Ii111 - I1iII1iiII . i1IIi
+  I1i += 1
+  self . symboltimes [ name ] = I1i
+  return I1i
+  if 35 - 35: I1II1 + iiI11iii111 - Iii1ii1II11i . I1II1 . iII1iII1i1iiI
+  if 87 - 87: i11ii11iIi11i
+  if 25 - 25: i1IIi . i1iIi11iIIi1I - i11ii11iIi11i / i1iIi11iIIi1I % i1iIi11iIIi1I * iIii1I11I1II1
+class III :
+ AFTERCOMMENT = 0
+ INSIDECOMMENT = 1
+ BEFORECOMMENT = 2
+ if 1 - 1: Iii1ii1II11i
+ def __init__ ( self , source , names ) :
+  self . indent = 0
+  self . first_on_line = 1
+  self . symboltimes = { }
+  self . names = names
+  self . nametranslator = iI1 ( )
+  if 62 - 62: i1IIi - I1iII1iiII
+  if 96 - 96: i1IIi . IiiI + Iii1ii1II11i
+  self . pending = [ ]
+  self . pending_indent = 0
+  if 48 - 48: iIii1I11I1II1 % i1IIi % I1II1 + iiI11iii111
+  if 30 - 30: i11iIiiIii % iIii1I11I1II1 . I1Ii111 % iIii1I11I1II1
+  self . this_lineno = 1
+  self . pending_newlines = 0
+  if 62 - 62: I11i11Ii * i11ii11iIi11i
+  self . skip_token = 0
+  if 79 - 79: i1iIi11iIIi1I . I1II1 * OOo - I1iII1iiII + iiI11iii111
+  self . paren_count = 0
+  self . curly_count = 0
+  self . square_count = 0
+  if 14 - 14: i11iIiiIii - I1II1 * i11ii11iIi11i
+  if conf . firstcomment :
+   self . commentstate = III . AFTERCOMMENT
+  else :
+   self . commentstate = III . BEFORECOMMENT
+  Ooooo00o0OoO = StringIO . StringIO ( source )
+  self . play ( Ooooo00o0OoO )
+  if 51 - 51: IiiI / iIii1I11I1II1 % Iii1ii1II11i + oOoO0oo0OOOo * iiI11iii111 + iiIIIII1i1iI
+  if 77 - 77: iiI11iii111 * i11ii11iIi11i
+ def play ( self , f ) :
+  for O0oO in tokenize . generate_tokens ( f . readline ) :
+   oOO0 , i1IIiIii1i , ooOOO0OooOo , I1Ii , oOO = O0oO
+   if 14 - 14: I1Ii111 % I1Ii111 / iII1iII1i1iiI
+   if 72 - 72: i1IIi - i11i - I1iII1iiII + I1iII1iiII * oOoO0oo0OOOo * I1iII1iiII
+   if 33 - 33: I11i11Ii
+   if oOO0 == tokenize . OP :
+    if i1IIiIii1i == "(" :
+     self . paren_count += 1
+    elif i1IIiIii1i == ")" :
+     self . paren_count -= 1
+    elif i1IIiIii1i == "{" :
+     self . curly_count += 1
+    elif i1IIiIii1i == "}" :
+     self . curly_count -= 1
+    elif i1IIiIii1i == "[" :
+     self . square_count += 1
+    elif i1IIiIii1i == "]" :
+     self . square_count -= 1
+     if 49 - 49: i1iIi11iIIi1I % I1II1 % I1II1 / I1II1
+    assert self . paren_count >= 0
+    assert self . curly_count >= 0
+    assert self . square_count >= 0
+    if 53 - 53: iIii1I11I1II1
+   if self . skip_token :
+    self . skip_token = 0
+    continue
+    if 68 - 68: OoooooooOO % i11i
+    if 26 - 26: i11i % i11iIiiIii % iIii1I11I1II1 % I1Ii111 * I1Ii111 * IiiI
+    if 24 - 24: i11i % iiIIIII1i1iI - iiI11iii111 + oOooOoO0Oo0O * IiiI
+   assert self . this_lineno <= ooOOO0OooOo [ 0 ]
+   if self . this_lineno < ooOOO0OooOo [ 0 ] :
+    if 2 - 2: OOo - iII1iII1i1iiI
+    if 83 - 83: Iii1ii1II11i % oOoO0oo0OOOo % OOo - i11i * I1iII1iiII / OoooooooOO
+    self . pending_newlines += ooOOO0OooOo [ 0 ] - self . this_lineno
+    self . this_lineno = ooOOO0OooOo [ 0 ]
+    if 18 - 18: i1iIi11iIIi1I + iIii1I11I1II1 - i11i - oOooOoO0Oo0O
+   if oOO0 in [ tokenize . NL , tokenize . NEWLINE ] :
+    for i1iiIIiiI111 in range ( self . pending_newlines ) :
+     if conf . blanks != conf . KEEP_BLANKS :
+      self . pending . append ( self . gen_noop_line ( ) + "\n" )
+      self . pending_indent = self . indent
+     else :
+      sys . stdout . write ( "\n" )
+    self . pending_newlines = 0
+    if 71 - 71: OoooooooOO
+   if oOO0 == tokenize . NL :
+    if self . first_on_line and conf . blanks != conf . KEEP_BLANKS :
+     self . pending . append ( self . gen_noop_line ( ) + "\n" )
+     self . pending_indent = self . indent
+    else :
+     sys . stdout . write ( "\n" )
+    self . this_lineno += 1
+    if self . commentstate == III . INSIDECOMMENT :
+     self . commentstate = III . AFTERCOMMENT
+     if 33 - 33: iiIIIII1i1iI
+   elif oOO0 == tokenize . NEWLINE :
+    self . first_on_line = 1
+    self . this_lineno += 1
+    sys . stdout . write ( "\n" )
+    if self . commentstate == III . INSIDECOMMENT :
+     self . commentstate = III . AFTERCOMMENT
+     if 62 - 62: IiiI + OOo + i1IIi / OoooooooOO
+   elif oOO0 == tokenize . INDENT :
+    self . indent += conf . indent
+   elif oOO0 == tokenize . DEDENT :
+    self . indent -= conf . indent
+   elif oOO0 == tokenize . COMMENT :
+    if self . commentstate == III . BEFORECOMMENT :
+     self . commentstate = III . INSIDECOMMENT
+     if 7 - 7: oOoO0oo0OOOo + i1IIi . oOooOoO0Oo0O / I11i11Ii
+    if self . first_on_line :
+     if self . commentstate in [ III . BEFORECOMMENT , III . INSIDECOMMENT ] :
+      if 22 - 22: iiI11iii111 - iiI11iii111 % I1iII1iiII . iiIIIII1i1iI + Iii1ii1II11i
+      if sys . hexversion >= 0x2040000 :
+       i1IIiIii1i += "\n"
+      self . line_append ( i1IIiIii1i )
+     elif conf . blanks != conf . KEEP_BLANKS :
+      self . pending . append ( self . gen_noop_line ( ) + "\n" )
+      self . pending_indent = self . indent
+     else :
+      sys . stdout . write ( "\n" )
+      if 63 - 63: oOooOoO0Oo0O % iiIIIII1i1iI * oOoO0oo0OOOo + iiIIIII1i1iI / I11i11Ii % I1II1
+     self . this_lineno += 1
+    else :
+     if sys . hexversion >= 0x2040000 :
+      sys . stdout . write ( "\n" )
+      self . this_lineno += 1
+      if 45 - 45: iII1iII1i1iiI
+      if 20 - 20: OoooooooOO * oOoO0oo0OOOo * O0 . I1iII1iiII
+    self . first_on_line = 1
+    if sys . hexversion >= 0x2040000 :
+     if 78 - 78: iIii1I11I1II1 + I1Ii111 - OOo * iiIIIII1i1iI - OoooooooOO % i11ii11iIi11i
+     self . skip_token = 1
+   elif oOO0 == tokenize . STRING :
+    if self . first_on_line :
+     if 34 - 34: O0
+     if 80 - 80: i1IIi - I11i11Ii / i1iIi11iIIi1I - i11iIiiIii
+     if 68 - 68: Iii1ii1II11i - IiiI % O0 % iiIIIII1i1iI
+     if self . paren_count > 0 or self . curly_count > 0 or self . square_count > 0 :
+      if 11 - 11: O0 / i1iIi11iIIi1I % I1iII1iiII + oOoO0oo0OOOo + iIii1I11I1II1
+      if 40 - 40: iiI11iii111 - I1iII1iiII . OOo * I11i11Ii % iiIIIII1i1iI
+      self . line_append ( i1IIiIii1i )
+      self . this_lineno += i1IIiIii1i . count ( "\n" )
+     else :
+      self . skip_token = 1
+    else :
+     self . line_append ( i1IIiIii1i )
+     self . this_lineno += i1IIiIii1i . count ( "\n" )
+   elif oOO0 == tokenize . NAME :
+    ( Iii , iIi1i ) = ooOOO0OooOo
+    if self . names . get ( ooOOO0OooOo ) :
+     i1IIiIii1i = self . nametranslator . get_name ( i1IIiIii1i )
+     if 56 - 56: i11iIiiIii . oOoO0oo0OOOo - oOooOoO0Oo0O * I1Ii111
+    self . line_append ( i1IIiIii1i )
+   else :
+    self . line_append ( i1IIiIii1i )
+    if 91 - 91: Iii1ii1II11i + OoooooooOO - i1IIi
+    if 84 - 84: OOo / iII1iII1i1iiI
+ def line_append ( self , s ) :
+  if self . pending :
+   OOOooo0OooOoO = max ( self . indent , self . pending_indent )
+   self . pending = map ( lambda oOoOOOo : " " * OOOooo0OooOoO + oOoOOOo ,
+ self . pending )
+   if conf . blanks == conf . OBFUSCATE_BLANKS :
+    sys . stdout . write ( '' . join ( self . pending ) )
+   self . pending = [ ]
+   if 43 - 43: i1IIi
+  if self . first_on_line :
+   sys . stdout . write ( " " * self . indent )
+  else :
+   sys . stdout . write ( " " * o0OO00 )
+  sys . stdout . write ( s )
+  self . first_on_line = 0
+  if 23 - 23: I1II1 + I1Ii111 . i11ii11iIi11i * oOooOoO0Oo0O + IiiI
+  if 18 - 18: iII1iII1i1iiI * oOoO0oo0OOOo . iII1iII1i1iiI / O0
+ def gen_noop_line ( self ) :
+  if self . paren_count > 0 or self . curly_count > 0 or self . square_count > 0 :
+   if 8 - 8: oOoO0oo0OOOo
+   if 4 - 4: IiiI + IiiI * iiI11iii111 - i11ii11iIi11i
+   oo0O000OoO = "# "
+  else :
+   o00o = random . randint ( 1 , 100 )
+   oo0O000OoO = "if %d - %d: " % ( o00o , o00o )
+  III11I = random . randint ( 1 , 6 )
+  for i1iiIIiiI111 in range ( III11I - 1 ) :
+   Ii1I11I = random . choice ( ( "." , "/" , "+" , "-" , "%" , "*" ) )
+   oo0O000OoO += self . nametranslator . get_bogus_name ( ) + " %s " % Ii1I11I
+  oo0O000OoO += self . nametranslator . get_bogus_name ( )
+  return oo0O000OoO
+  if 36 - 36: O0 + I11i11Ii
+  if 5 - 5: I11i11Ii * i11ii11iIi11i
+  if 46 - 46: iiI11iii111
+def I11iIiII ( source ) :
+ Ooooo00o0OoO = StringIO . StringIO ( source )
+ OO0OO0OO = [ Ooooo00o0OoO . readline ( ) , Ooooo00o0OoO . readline ( ) ]
+ Ooo = ""
+ for iIiIIi1 in OO0OO0OO :
+  if re . search ( "coding[:=]\s*([-\w_.]+)" , iIiIIi1 ) :
+   if iIiIIi1 . strip ( ) . startswith ( "#" ) :
+    if 65 - 65: I11i11Ii / I1Ii111
+    Ooo += "\n"
+   else :
+    if 12 - 12: I1Ii111 % i11ii11iIi11i
+    print >> sys . stderr , "ERROR: Python 2.3 with coding declaration in non-comment!"
+    sys . exit ( 1 )
+  else :
+   if 48 - 48: I1II1 . i11iIiiIii
+   if 5 - 5: Iii1ii1II11i . IiiI . i11i . OoooooooOO
+   Ooo += iIiIIi1
+   if 96 - 96: i11iIiiIii - I1iII1iiII % O0 / i1iIi11iIIi1I
+ return Ooo + Ooooo00o0OoO . read ( )
+ if 100 - 100: I1II1 / OOo - OoooooooOO % i11i - oOooOoO0Oo0O % i11ii11iIi11i
+ if 60 - 60: iIii1I11I1II1 + i1IIi
+ if 86 - 86: iIii1I11I1II1 + i11ii11iIi11i . i11iIiiIii - OOo
+def ooO000O ( ) :
+ print >> sys . stderr , """
+Usage:
+    
+pyobfuscate [options] <file>
+
+Options:
+
+-h, --help              Print this help.     
+-i, --indent <num>      Indentation to use. Default is 1. 
+-s, --seed <seed>       Seed to use for name randomization. Default is
+                        system time. 
+-r, --removeblanks      Remove blank lines, instead of obfuscate
+-k, --keepblanks        Keep blank lines, instead of obfuscate
+-f, --firstcomment      Remove first block of comments as well
+-a, --allpublic	        When __all__ is missing, assume everything is public.
+                        The default is to assume nothing is public. 
+-v, --verbose	        Verbose mode.
+"""
+ if 53 - 53: oOoO0oo0OOOo . I1II1 / OOo
+ if 39 - 39: OOo % O0 % i11ii11iIi11i . i1IIi
+class oOo00OooO0oO :
+ KEEP_BLANKS = 0
+ OBFUSCATE_BLANKS = 1
+ REMOVE_BLANKS = 2
+ if 16 - 16: iII1iII1i1iiI / I11i11Ii + I1iII1iiII / OOo
+ def __init__ ( self ) :
+  try :
+   IIIiiI1 , O0O0ooOOO = getopt . getopt ( sys . argv [ 1 : ] , "hi:s:rkfav" ,
+ [ "help" , "indent=" , "seed=" , "removeblanks" ,
+ "keepblanks" , "firstcomment" , "allpublic" ,
+ "verbose" ] )
+   if len ( O0O0ooOOO ) != 1 :
+    raise getopt . GetoptError ( "A filename is required" , "" )
+  except getopt . GetoptError , i1i1I111iIi1 :
+   print >> sys . stderr , "Error:" , i1i1I111iIi1
+   ooO000O ( )
+   sys . exit ( 2 )
+   if 70 - 70: iiI11iii111 . O0 . iiIIIII1i1iI . O0 + i1IIi
+  self . file = O0O0ooOOO [ 0 ]
+  self . indent = 1
+  self . seed = 42
+  self . blanks = self . OBFUSCATE_BLANKS
+  self . firstcomment = False
+  self . allpublic = False
+  self . verbose = False
+  if 9 - 9: I11i11Ii
+  for O0O00OOo , OoOOo in IIIiiI1 :
+   if O0O00OOo in ( "-h" , "--help" ) :
+    ooO000O ( )
+    sys . exit ( )
+   if O0O00OOo in ( "-i" , "--indent" ) :
+    self . indent = int ( OoOOo )
+   if O0O00OOo in ( "-s" , "--seed" ) :
+    self . seed = OoOOo
+   if O0O00OOo in ( "-r" , "--removeblanks" ) :
+    self . blanks = self . REMOVE_BLANKS
+   if O0O00OOo in ( "-k" , "--keepblanks" ) :
+    self . blanks = self . KEEP_BLANKS
+   if O0O00OOo in ( "-f" , "--firstcomment" ) :
+    self . firstcomment = True
+   if O0O00OOo in ( "-a" , "--allpublic" ) :
+    self . allpublic = True
+   if O0O00OOo == ( "-v" , "--verbose" ) :
+    self . verbose = True
+    if 17 - 17: i1IIi
+    if 1 - 1: iiI11iii111
+    if 78 - 78: IiiI + I1Ii111 - O0
+def i1I1iIi1IiI ( ) :
+ global conf
+ conf = oOo00OooO0oO ( )
+ random . seed ( conf . seed )
+ if 11 - 11: i11i
+ O00O00O000OOO = open ( conf . file , 'rU' ) . read ( )
+ if 3 - 3: O0
+ if sys . version_info [ : 2 ] == ( 2 , 3 ) :
+  if 64 - 64: i1IIi % iiI11iii111 / i11iIiiIii - i1IIi % I1iII1iiII . I1II1
+  II1i111 = I11iIiII ( O00O00O000OOO )
+ else :
+  II1i111 = O00O00O000OOO
+  if 50 - 50: iII1iII1i1iiI % i1IIi
+  if 21 - 21: OoooooooOO - iIii1I11I1II1
+  if 93 - 93: Iii1ii1II11i - oOoO0oo0OOOo % i11ii11iIi11i . i11ii11iIi11i - iiI11iii111
+ O00ooOo = OO00OO0O0 ( II1i111 )
+ if 80 - 80: oOoO0oo0OOOo - I1iII1iiII + OoooooooOO
+ if 98 - 98: I1iII1iiII + i1IIi . oOooOoO0Oo0O - i11i - oOoO0oo0OOOo
+ if 24 - 24: I11i11Ii - i1IIi + I1Ii111
+ if 38 - 38: OoooooooOO / IiiI . O0 / i1IIi / I11i11Ii + iIii1I11I1II1
+ if 96 - 96: I1II1
+ if 18 - 18: I1II1 * I1Ii111 - OOo
+ if 31 - 31: I11i11Ii - O0 % i11ii11iIi11i % Iii1ii1II11i
+ if 45 - 45: IiiI + i11i * i11iIiiIii
+ IiIIi1I1I11Ii = ii1 ( II1i111 , O00ooOo . pubapi )
+ if 64 - 64: OoooooooOO
+ if 81 - 81: IiiI - O0 * OoooooooOO
+ if 23 - 23: i11i / Iii1ii1II11i
+ if 28 - 28: I11i11Ii * iiI11iii111 - i1iIi11iIIi1I
+ if 19 - 19: I1Ii111
+ if 67 - 67: O0 % iIii1I11I1II1 / iII1iII1i1iiI . i11iIiiIii - OOo + O0
+ if 27 - 27: I1iII1iiII
+ if 89 - 89: i11i / Iii1ii1II11i
+ if 14 - 14: I1iII1iiII . oOooOoO0Oo0O * iiI11iii111 + i11i - iiI11iii111 + I1iII1iiII
+ if 18 - 18: Iii1ii1II11i - oOoO0oo0OOOo - oOooOoO0Oo0O - oOooOoO0Oo0O
+ if 54 - 54: I11i11Ii + oOooOoO0Oo0O / I1II1 . oOooOoO0Oo0O * i11ii11iIi11i
+ IIiIiiiIIIIi1 = oOOoo0o0OOOO ( O00O00O000OOO , IiIIi1I1I11Ii . names )
+ if 39 - 39: i1iIi11iIIi1I / OOo / iiIIIII1i1iI
+ if 81 - 81: I1Ii111 / i1iIi11iIIi1I % OoooooooOO * Iii1ii1II11i / Iii1ii1II11i
+ if 28 - 28: i11iIiiIii / oOoO0oo0OOOo . iIii1I11I1II1 / i11i
+ if 72 - 72: OoooooooOO / oOooOoO0Oo0O + OOo / i11ii11iIi11i * OOo
+ if 34 - 34: O0 * O0 % OoooooooOO + I1II1 * iIii1I11I1II1 % OOo
+ III ( O00O00O000OOO , IIiIiiiIIIIi1 . result )
+ if 25 - 25: I1Ii111 + i11ii11iIi11i . oOoO0oo0OOOo % i11ii11iIi11i * I1iII1iiII
+ if 32 - 32: i11iIiiIii - iiIIIII1i1iI
+ if 53 - 53: OoooooooOO - iII1iII1i1iiI
+ print "# dd678faae9ac167bc83abf78e5cb2f3f0688d3a3"
+ if 87 - 87: Iii1ii1II11i . oOooOoO0Oo0O
+if __name__ == "__main__" :
+ i1I1iIi1IiI ( )
+ if 17 - 17: OOo . i11iIiiIii
+# dd678faae9ac167bc83abf78e5cb2f3f0688d3a3

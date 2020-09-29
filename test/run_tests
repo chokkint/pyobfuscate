@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Obfuscate the obfuscator as a torture test
+# ./pyobfuscate xxx.py >> xxx_rename.py
 
 ../pyobfuscate ../pyobfuscate > pyobfuscate
 chmod u+x pyobfuscate
